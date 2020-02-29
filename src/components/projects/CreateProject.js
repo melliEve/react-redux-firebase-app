@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { createProject } from '../../store/actions/projectActions';
 
 class CreateProject extends Component {
@@ -15,11 +16,16 @@ class CreateProject extends Component {
   }
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log('this.state', this.state);
-    this.props.createProject(this.state)
+    //console.log('this.state', this.state);
+    console.log('this.props', this.props);
+    this.props.createProject(this.state);
+    this.props.history.push('/');
   }
 
   render() {
+    const { auth } = this.props
+    if (!auth.uid) return <Redirect to="/signIn" />
+
     return (
       <div className="container">
         <form onSubmit={this.handleSubmit} className="white">
@@ -33,11 +39,17 @@ class CreateProject extends Component {
             <textarea id="content" className="materialize-textarea" onChange={this.handleChange} />
           </div>
           <div className="input-field">
-            <button className="btn teal lighten-1 z-depth-0" >Create</button>
+            <button className="btn teal lighten-1 z-depth-0">Create</button>
           </div>
         </form>
       </div>
     )
+  }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    auth: state.firebase.auth
   }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -45,4 +57,4 @@ const mapDispatchToProps = (dispatch) => {
     createProject: (project) => dispatch(createProject(project))
   }
 }
-export default connect(null, mapDispatchToProps)(CreateProject);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProject);
